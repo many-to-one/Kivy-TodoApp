@@ -1,4 +1,7 @@
 from kivy.app import App
+from kivymd.theming import ThemeManager
+from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.lang import Builder
 from kivy.metrics import dp
 from kivy.properties import StringProperty, NumericProperty, ObjectProperty
 from kivy.uix.label import Label
@@ -10,7 +13,11 @@ from kivy.uix.button import Button
 import sqlite3
 
 
-class MainWidget(BoxLayout):
+class MenuScreen(Screen):
+    pass
+
+
+class MainWidget(BoxLayout, Screen):
     def result(self):
         minutes = int(self.minutes.text)
         visits = int(self.visits.text)
@@ -37,8 +44,11 @@ def show_db_results():
 
 
 
-class TheLabApp(App):
+class TheLabApp(App):    
     def build(self):
+        sm = ScreenManager()
+        sm.add_widget(MenuScreen(name='menu'))
+        sm.add_widget(MainWidget(name='main'))
         conn = sqlite3.connect('app_db.db')
         c = conn.cursor()
         c.execute("""
@@ -52,7 +62,8 @@ class TheLabApp(App):
         conn.commit()
         conn.close()
 
-        return MainWidget()
+        return sm
+
 
 
 TheLabApp().run()

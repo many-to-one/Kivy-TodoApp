@@ -1,29 +1,68 @@
-import kivy
 from kivy.app import App
+from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.lang import Builder
+from kivy.metrics import dp
 from kivy.uix.label import Label
-from kivy.uix.gridlayout import GridLayout
 from kivy.uix.textinput import TextInput
-from kivy.uix.button import Button
 from kivy.uix.widget import Widget
-from kivy.properties import ObjectProperty
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.button import Button
+import sqlite3
+
+class MenuScreen(Screen):
+    pass
 
 
-class MyGrid(Widget):
-    name = ObjectProperty(None)
-    email = ObjectProperty(None)
-
-    def btn(self):
-        print("Name:", self.name.text, "email:", self.email.text)
-        self.name.text = ""
-        self.email.text = ""
+class SetScreen(BoxLayout, Screen):
+    pass
 
 
+class MainWidget(BoxLayout, Screen):
+    def result(self):
+        minutes = int(self.minutes.text)
+        visits = int(self.visits.text)
+        publications = int(self.publications.text)
+        films = int(self.films.text)
+        conn = sqlite3.connect('app_db.db')
+        c = conn.cursor()
+        sql = ("INSERT INTO fruits(minutes, visits, publications, films) VALUES(?, ?, ?, ?)")
+        data = (minutes, visits, publications, films)
+        c.execute(sql, data)
+        conn.commit()
+        conn.close()
+        show_db_results()
+
+def show_db_results():
+    con = sqlite3.connect("app_db.db")
+    c = con.cursor()
+    c.execute("SELECT * FROM fruits")
+    records = c.fetchall()
+    result = []
+    for i in records:
+        result.append(i)
+    print(result[-1])
 
 
-class MyApp(App):
+class TestApp(App):
     def build(self):
-        return MyGrid()
+        sm = ScreenManager()
+        sm.add_widget(MenuScreen(name='menu'))
+        sm.add_widget(MainWidget(name='main'))
+        conn = sqlite3.connect('app_db.db')
+        c = conn.cursor()
+        c.execute("""
+                    CREATE TABLE if not exists fruits(
+                        minutes integer,
+                        visits integer,
+                        publications integer,
+                        films integer
+                    )
+                """)
+        conn.commit()
+        conn.close()
+
+        return sm
 
 
-if __name__ == "__main__":
-    MyApp().run()
+TestApp().run()

@@ -1,14 +1,10 @@
 
 <MenuScreen>:
-    
-    Image:
-        source: 'templates/main_page.png'
-    Button:
-        text: 'Go to Settings'
-        size: '5dp', '2dp'
-        pos: '10dp', '20dp'
-        on_press:
-            root.manager.current = 'main'
+    BoxLayout:
+        Button:
+            text: 'Go to Settings'
+            on_press:
+                root.manager.current = 'main'
 
 <MainWidget>:
     orientation: 'vertical'
