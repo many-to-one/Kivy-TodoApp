@@ -1,8 +1,73 @@
-MainWidget:
-
 <MainWidget>:
-    cols: 2
+
+    minutes: minutes
+    visits: visits
+    publications: publications
+    films: films
+    orientation: 'vertical'
+    spacing: '20dp'
+    padding: [dp(20),dp(10),dp(20),dp(10)] 
+
+
+    BoxLayout:
+        size_hint: 1, .5
+        TextInput:
+            id: minutes
+            size_hint: 1, 1
+            font_size: '50dp'
+            multiline: False
+            font_name: 'fonts/fruit.ttf'
+        Label:
+            text: 'MINUTY  ' + str(minutes.text)
+            font_size: '20dp'
+            multiline: False
+            font_name: 'fonts/fruit.ttf'
+    BoxLayout:
+        size_hint: 1, .5
+        TextInput:
+            id: visits
+            size_hint: 1, 1
+            font_size: '50dp'
+            multiline: False
+            font_name: 'fonts/fruit.ttf'
+        Label:
+            text: 'ODWIEDZINY  ' + str(visits.text)
+            font_size: '20dp'
+            multiline: False
+            font_name: 'fonts/fruit.ttf'
+    BoxLayout:
+        size_hint: 1, .5
+        TextInput:
+            id: publications
+            size_hint: 1, 1
+            font_size: '50dp'
+            multiline: False
+            font_name: 'fonts/fruit.ttf'
+        Label:
+            text: 'PUBLIKACJE  ' + str(publications.text)
+            font_size: '20dp'
+            multiline: False
+            font_name: 'fonts/fruit.ttf'
+    BoxLayout:
+        size_hint: 1, .5
+        TextInput:
+            id: films
+            size_hint: 1, 1
+            font_size: '50dp'
+            multiline: False
+            font_name: 'fonts/fruit.ttf'
+        Label:
+            text: "FILMY  " + str(films.text)
+            font_size: '20dp'
+            multiline: False
+            font_name: 'fonts/fruit.ttf'
     Button:
-        text: 'Hello'
-    Button:
-        text: 'World'
+        text: 'ZAPISZ'
+        size_hint: 1, None
+        height: '75dp'
+        font_size: '30dp'
+        font_name: 'fonts/fruit.ttf'
+        on_press: root.result()
+
+
+
