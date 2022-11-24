@@ -1,4 +1,5 @@
 from kivy.app import App
+from kivy.uix.anchorlayout import AnchorLayout
 from kivymd.app import MDApp
 from kivymd.theming import ThemeManager
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -30,37 +31,46 @@ class SuccessScreen(Screen):
 
 class DataResult(Screen):
 
-    con = sqlite3.connect("app_db.db")
-    c = con.cursor()
-    c.execute("SELECT * FROM fruits")
-    records = c.fetchall()
+    # con = sqlite3.connect("app_db.db")
+    # c = con.cursor()
+    # c.execute("SELECT * FROM fruits")
+    # records = c.fetchall()
 
-    data_tables = MDDataTable(
-        size_hint=(0.5, 0.5),
-        use_pagination=True,
-        check=True,
-        column_data=[
-            ('minuty', dp(30)),
-            ('odwiedziny', dp(30)),
-            ('publikacje', dp(30)),
-            ('filmy', dp(30))
-        ],
-        row_data=[
-            (
-                i[:][0],
-                i[:][1],
-                i[:][2],
-                i[:][3],
-            )
-            for i in records
-        ]
-    )
+    def load_table(self):
+        con = sqlite3.connect("app_db.db")
+        c = con.cursor()
+        c.execute("SELECT * FROM fruits")
+        records = c.fetchall()
+        layout = AnchorLayout()
 
-    def get_dt(self):
-        sm.get_screen('dt').ids.anch.add_widget(self.data_tables)
+        self.data_tables = MDDataTable(
+            size_hint=(0.5, 0.5),
+            use_pagination=True,
+            check=True,
+            column_data=[
+                ('minuty', dp(30)),
+                ('odwiedziny', dp(30)),
+                ('publikacje', dp(30)),
+                ('filmy', dp(30))
+            ],
+            row_data=[
+                (
+                    i[:][0],
+                    i[:][1],
+                    i[:][2],
+                    i[:][3],
+                )
+                for i in records
+            ]
+        )
+        self.add_widget(self.data_tables)
+        return layout
 
-    def close_dt(self):
-        sm.get_screen('dt').ids.anch.remove_widget(self.data_tables)
+    # def get_dt(self):
+    #     sm.get_screen('dt').ids.anch.add_widget(self.data_tables)
+    #
+    # def close_dt(self):
+    #     sm.get_screen('dt').ids.anch.remove_widget(self.data_tables)
 
 
 class MainWidget(BoxLayout, Screen):
@@ -92,7 +102,6 @@ class TheLabApp(MDApp):
     def build(self):
         global sm
         sm = ScreenManager()
-        #sm.add_widget(Builder.load_file('TheLab.kv'))
         sm.add_widget(MenuScreen(name='menu'))
         sm.add_widget(MainWidget(name='main'))
         sm.add_widget(DataResult(name='success'))
@@ -110,7 +119,6 @@ class TheLabApp(MDApp):
         conn.close()
 
         return sm
-
 
 
 TheLabApp().run()
