@@ -1,4 +1,5 @@
 from kivy.app import App
+from kivymd.app import MDApp
 from kivymd.theming import ThemeManager
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.lang import Builder
@@ -9,12 +10,57 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.widget import Widget
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.treeview import TreeView, TreeViewLabel
 from kivy.uix.button import Button
 import sqlite3
+from kivy.core.window import Window
+from kivymd.uix.datatables import MDDataTable
+
+
+Window.size = (300, 600)
 
 
 class MenuScreen(Screen):
     pass
+
+
+class SuccessScreen(Screen):
+    pass
+
+
+class DataResult(Screen):
+
+    con = sqlite3.connect("app_db.db")
+    c = con.cursor()
+    c.execute("SELECT * FROM fruits")
+    records = c.fetchall()
+
+    data_tables = MDDataTable(
+        size_hint=(0.5, 0.5),
+        use_pagination=True,
+        check=True,
+        column_data=[
+            ('minuty', dp(30)),
+            ('odwiedziny', dp(30)),
+            ('publikacje', dp(30)),
+            ('filmy', dp(30))
+        ],
+        row_data=[
+            (
+                i[:][0],
+                i[:][1],
+                i[:][2],
+                i[:][3],
+            )
+            for i in records
+        ]
+    )
+
+    def get_dt(self):
+        sm.get_screen('dt').ids.anch.add_widget(self.data_tables)
+
+    def close_dt(self):
+        sm.get_screen('dt').ids.anch.remove_widget(self.data_tables)
 
 
 class MainWidget(BoxLayout, Screen):
@@ -30,25 +76,26 @@ class MainWidget(BoxLayout, Screen):
         c.execute(sql, data)
         conn.commit()
         conn.close()
-        show_db_results()
+        self.show_db_results()
 
-def show_db_results():
-    con = sqlite3.connect("app_db.db")
-    c = con.cursor()
-    c.execute("SELECT * FROM fruits")
-    records = c.fetchall()
-    result = []
-    for i in records:
-        result.append(i)
-    print(result[-1])
+    def show_db_results(self):
+        con = sqlite3.connect("app_db.db")
+        c = con.cursor()
+        c.execute("SELECT * FROM fruits")
+        records = c.fetchall()
+        return records
+        #print(result[-1])
 
 
 
-class TheLabApp(App):    
+class TheLabApp(MDApp):
     def build(self):
+        global sm
         sm = ScreenManager()
+        #sm.add_widget(Builder.load_file('TheLab.kv'))
         sm.add_widget(MenuScreen(name='menu'))
         sm.add_widget(MainWidget(name='main'))
+        sm.add_widget(DataResult(name='success'))
         conn = sqlite3.connect('app_db.db')
         c = conn.cursor()
         c.execute("""

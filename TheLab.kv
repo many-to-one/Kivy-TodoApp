@@ -1,14 +1,40 @@
 
 <MenuScreen>:
-    
-    Image:
-        source: 'templates/main_page.png'
+
     Button:
         text: 'Go to Settings'
         size: '5dp', '2dp'
         pos: '10dp', '20dp'
         on_press:
             root.manager.current = 'main'
+    Image:
+        source: 'img/main.png'
+
+
+<SuccessScreen>:
+    Image:
+        source: 'img/success.png'
+    Label:
+        text: 'Success'
+
+
+<DataResult>:
+    name: 'dt'
+    MDLabel:
+        text: 'Data-Table'
+        pos_hint: {'center_x': 0.75, 'center_y': 0.90}
+        font_size: 35
+    MDRoundFlatButton:
+        text: 'Show table'
+        on_press: app.get_dt()
+    MDRoundFlatButton:
+        text: 'Close table'
+        on_press: app.close_dt()
+    AnchorLayout:
+        id: anch
+        pos_hint: {'center_x': 0.50, 'center_y': 0.50}
+
+
 
 <MainWidget>:
     orientation: 'vertical'
@@ -27,7 +53,8 @@
             font_size: '50dp'
             multiline: False
             font_name: 'fonts/fruit.ttf'
-        Label:
+        MDLabel:
+            pos_hint: {'center_x': 3}
             text: 'MINUTY  ' + str(minutes.text)
             font_size: '20dp'
             multiline: False
@@ -40,7 +67,8 @@
             font_size: '50dp'
             multiline: False
             font_name: 'fonts/fruit.ttf'
-        Label:
+        MDLabel:
+            pos_hint: {'center_x': 3}
             text: 'ODWIEDZINY  ' + str(visits.text)
             font_size: '20dp'
             multiline: False
@@ -53,7 +81,8 @@
             font_size: '50dp'
             multiline: False
             font_name: 'fonts/fruit.ttf'
-        Label:
+        MDLabel:
+            pos_hint: {'center_x': 3}
             text: 'PUBLIKACJE  ' + str(publications.text)
             font_size: '20dp'
             multiline: False
@@ -66,7 +95,8 @@
             font_size: '50dp'
             multiline: False
             font_name: 'fonts/fruit.ttf'
-        Label:
+        MDLabel:
+            pos_hint: {'center_x': 3}
             text: "FILMY  " + str(films.text)
             font_size: '20dp'
             multiline: False
@@ -77,7 +107,12 @@
         height: '75dp'
         font_size: '30dp'
         font_name: 'fonts/fruit.ttf'
-        on_press: root.result()
+        #background_normal: 'img/button_save.png'
+        on_press:
+            root.manager.current = 'success'
+            root.result()
+
+
 
 
             
