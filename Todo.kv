@@ -1,38 +1,59 @@
 <TodoCard>
     #elevation: 10
-    md_bg_color: 1, 1, 1, 1
-    radius: [8]
-    size_hint_y: .1
+    #md_bg_color: 1, 1, 1, 1
+    #radius: [8]
+    #size_hint_y: 1
     MDFloatLayout:
         id: bar
         size_hint: .01, .9
         pos_hint: {'center_x': .02, 'center_y': .5}
         md_bg_color: 1, 170/255, 23/255, 1
     MDLabel:
-        text: 'Task1'
+        id: task_title
+        text: root.title
         markup: True
         font_size: '20sp'
         size_hint_x: .8
         pos_hint: {'center_x': .46, 'center_y': .8}
     MDCheckbox:
+        id: task_checkbox
         size_hint: None, None
         size: '48dp', '48dp'
         unselected_color: 1, 170/255, 23/255, 1
-        selected_color: 1, 179/255, 0, 1
+        selected_color: 0, 179/255, 0, 1
         pos_hint: {'center_x': .95, 'center_y': .8}
-        on_active: app.on_complete()
+        on_active: app.on_complete(*args, description, bar)
     MDLabel:
+        id: task_description
         id: description
-        text: 'Buing fruits'
+        text: root.description
         markup: True
-        font_size: '20sp'
+        font_size: '15sp'
         size_hint_x: .9
         line_height: .8
         pos_hint: {'center_x': .51, 'center_y': .4}
+    Button:
+        text: 'DELETE'
+        size_hint: .45, .08
+        pos_hint: {'center_x': .5, 'center_y': .36}
+        background_color: 0, 0, 0, 0
+        font_size: '18sp'
+        color: 1, 1, 1, 1
+        on_release:
+            app.add_todo(title.text, description.text)
+            root.manager.transition.direction = 'left'
+        canvas.before:
+            Color:
+                rgb: (1, 170/255, 23/255, 1)
+            RoundedRectangle:
+                size: self.size
+                pos: self.pos
+                radius: [25]
 
 
 MDScreen:
     date: date
+    todo_list: todo_list
     name: 'main'
     MDFloatLayout:
         md_bg_color: 1, 1, 1, 1
@@ -50,20 +71,23 @@ MDScreen:
             pos_hint: {'center_x': .89, 'center_y': .925}
             user_font_size: '35sp'
             md_bg_color: 1, 170/255, 23/255, 1
+            theme_text_color: 'Custom'
             text_color: 1, 1, 1, 1
-            #theme_text_color: 'Custom'
-            #on_relese: app.add_todo()
+            on_release:
+                root.manager.transition.direction = 'left'
+                root.manager.current = "add_todo"
+
         ScrollView:
             do_scroll_y: True
             do_scroll_x: False
             size_hint_y: .85
             pos_hint: {'center_x': .5, 'y': 0}
             bar_width: 0
-            #GridLayout:
-            #    id: todo_list
-            #    cols: 1
-            #    height: self.minimum.height
-            #    row_default_height: 80
-            #    size_hint_y: None
-            #    padding: 15, 10
-            #    spaccing: 15, 10
+            GridLayout:
+                id: todo_list
+                cols: 1
+                height: self.minimum_height
+                row_default_height: 80
+                size_hint_y: None
+                padding: 15, 10
+                spaccing: 15, 10
