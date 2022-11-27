@@ -3,7 +3,8 @@ from kivy.uix.button import Button
 from kivymd.app import MDApp
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.properties import StringProperty, ObjectProperty
+from kivy.properties import StringProperty, ObjectProperty, \
+    BooleanProperty
 import sqlite3
 from kivy.core.window import Window
 import datetime
@@ -12,31 +13,26 @@ from kivymd.uix.behaviors import FakeRectangularElevationBehavior, \
     RectangularElevationBehavior, CommonElevationBehavior
 from kivymd.uix.floatlayout import FloatLayout
 from kivymd.uix.snackbar import Snackbar
+from database import Database
 
+database = Database()
 Window.size = (300, 600)
 
 
 class TodoCard(CommonElevationBehavior, FloatLayout):
     title = StringProperty()
     description = StringProperty()
+    task_checkbox = StringProperty()
+    icon_delete = StringProperty()
 
 
 class TodoApp(MDApp):
     def build(self):
         global sm
         sm = ScreenManager()
-        sm.add_widget(Builder.load_file('AddTodo.kv'))
         sm.add_widget(Builder.load_file('Todo.kv'))
-
-        conn = sqlite3.connect('todo.db')
-        c = conn.cursor()
-        c.execute(""" CREATE TABLE if not exists todo(
-                        title text,
-                        description text )""")
-
-        conn.commit()
-        conn.close()
-
+        sm.add_widget(Builder.load_file('AddTodo.kv'))
+        
         return sm
 
     def on_start(self):
@@ -55,10 +51,20 @@ class TodoApp(MDApp):
         month = str(datetime.datetime.now().strftime("%b"))
         day = str(datetime.datetime.now().strftime("%d"))
         sm.get_screen('main').date.text = f"{days[wd]}, {day}, {month}, {year}"
+        # sm.current = 'main'
+        #database.connect_db
+        sql = database.get_tasks()
+        for row in sql:
+            sm.get_screen('main').todo_list.add_widget(TodoCard(
+                title=row[0],
+                description=row[1]
+            ))
 
-    def on_complete(self, value, description, bar):
+    def on_complete(self, checkbox, value, title, description, bar):
         if value:
-            description.text = f'[s]{description.text}[/s]'
+            description.text = ''#f'[s]{description.text}[/s]'
+            bar.md_bg_color = 0, 179/255, 0, 1
+            title.text = ''#f'[s]{title.text}[/s]'
             bar.md_bg_color = 0, 179/255, 0, 1
         else:
             remove = ['[s]', '[/s]']
@@ -69,30 +75,17 @@ class TodoApp(MDApp):
     def add_todo(self, title, description):
         if title != '' and description != '' and len(title) < 21 and \
                 len(description) < 61:
-
-            ##########################DATABASE##########################
-            conn = sqlite3.connect('todo.db')
-            c = conn.cursor()
-            sql = (
-                "INSERT INTO todo(title, description) VALUES(?, ?)")
-            data = (title, description)
-            c.execute(sql, data)
-            #####################SELECT-FROM-DATABASE###################
-            sm.current = 'main'
-            sm.transition.direction = 'left'
-            c.execute("SELECT * FROM todo")
-            records = c.fetchall()
-            for row in records:
+            sql = database.create_task(title, description)
+            for row in sql[len(sql)-1:]:
                 sm.get_screen('main').todo_list.add_widget(
                     TodoCard(
                         title=row[0],
                         description=row[1]
                     )
                 )
-            conn.commit()
-            conn.close()
-            ######################END-DATABASE##########################
             sm.get_screen('add_todo').description.text = ''
+            sm.get_screen('add_todo').title.text = ''
+            sm.current = 'main'
         elif title == '':
             Snackbar(
                 text='The title is missing!',
@@ -133,6 +126,26 @@ class TodoApp(MDApp):
                 bg_color=(1, 170/255, 23/255, 1),
                 font_size='18sp',
             ).open()
+
+    def delete_current_task(self, value, title, description, bar):
+        # if value:
+        #     description.text = ''#f'[s]{description.text}[/s]'
+        #     bar.md_bg_color = 0, 179/255, 0, 1
+        #     title.text = ''#f'[s]{title.text}[/s]'
+        #     bar.md_bg_color = 0, 179/255, 0, 1
+        sql = database.delete_task(title.text, description.text)
+        # title.text = f'[s]{title.text}[/s]'
+        # bar.md_bg_color = 0, 179/255, 0, 1
+        # description.text = '[s]{description.text}[/s]'
+        # bar.md_bg_color = 0, 179/255, 0, 1
+        # sm.get_screen('main')
+        for row in sql[:-1]:
+            sm.get_screen('main').todo_list.add_widget(
+                TodoCard(
+                    title=row[0],
+                    description=row[1]
+                )
+            )
 
 
 TodoApp().run()
