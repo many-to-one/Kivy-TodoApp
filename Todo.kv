@@ -17,14 +17,6 @@
         font_size: '20sp'
         size_hint_x: .8
         pos_hint: {'center_x': .46, 'center_y': .8}
-    MDCheckbox:
-        id: task_checkbox
-        size_hint: None, None
-        size: '48dp', '48dp'
-        unselected_color: 1, 170/255, 23/255, 1
-        selected_color: 0, 179/255, 0, 1
-        pos_hint: {'center_x': .95, 'center_y': .8}
-        on_active: app.on_complete(*args, title, description, bar)
     MDLabel:
         id: description
         text: root.description
@@ -37,18 +29,19 @@
         id: icon_delete
         icon: 'delete'
         #size_hint: .02, .03
-        pos_hint: {'center_x': .85, 'center_y': .8}
+        pos_hint: {'center_x': .95, 'center_y': .8}
         background_color: 0, 0, 0, 0
         font_size: '18sp'
         color: 0, 0, 1, 1
         on_release:
             app.delete_current_task(*args, title, description, bar)
-    
+
 
 MDScreen:
     date: date
     todo_list: todo_list
     name: 'main'
+
     MDFloatLayout:
         md_bg_color: 1, 1, 1, 1
         MDLabel:

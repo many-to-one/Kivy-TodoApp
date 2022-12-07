@@ -51,8 +51,6 @@ class TodoApp(MDApp):
         month = str(datetime.datetime.now().strftime("%b"))
         day = str(datetime.datetime.now().strftime("%d"))
         sm.get_screen('main').date.text = f"{days[wd]}, {day}, {month}, {year}"
-        # sm.current = 'main'
-        #database.connect_db
         sql = database.get_tasks()
         for row in sql:
             sm.get_screen('main').todo_list.add_widget(TodoCard(
@@ -62,9 +60,9 @@ class TodoApp(MDApp):
 
     def on_complete(self, checkbox, value, title, description, bar):
         if value:
-            description.text = ''#f'[s]{description.text}[/s]'
+            description.text = ''
             bar.md_bg_color = 0, 179/255, 0, 1
-            title.text = ''#f'[s]{title.text}[/s]'
+            title.text = ''
             bar.md_bg_color = 0, 179/255, 0, 1
         else:
             remove = ['[s]', '[/s]']
@@ -76,6 +74,7 @@ class TodoApp(MDApp):
         if title != '' and description != '' and len(title) < 21 and \
                 len(description) < 61:
             sql = database.create_task(title, description)
+
             for row in sql[len(sql)-1:]:
                 sm.get_screen('main').todo_list.add_widget(
                     TodoCard(
@@ -83,6 +82,7 @@ class TodoApp(MDApp):
                         description=row[1]
                     )
                 )
+
             sm.get_screen('add_todo').description.text = ''
             sm.get_screen('add_todo').title.text = ''
             sm.current = 'main'
@@ -128,24 +128,20 @@ class TodoApp(MDApp):
             ).open()
 
     def delete_current_task(self, value, title, description, bar):
-        # if value:
-        #     description.text = ''#f'[s]{description.text}[/s]'
-        #     bar.md_bg_color = 0, 179/255, 0, 1
-        #     title.text = ''#f'[s]{title.text}[/s]'
-        #     bar.md_bg_color = 0, 179/255, 0, 1
-        sql = database.delete_task(title.text, description.text)
-        # title.text = f'[s]{title.text}[/s]'
-        # bar.md_bg_color = 0, 179/255, 0, 1
-        # description.text = '[s]{description.text}[/s]'
-        # bar.md_bg_color = 0, 179/255, 0, 1
-        # sm.get_screen('main')
-        for row in sql[:-1]:
-            sm.get_screen('main').todo_list.add_widget(
-                TodoCard(
-                    title=row[0],
-                    description=row[1]
-                )
-            )
-
+        database.delete_task(title.text, description.text)
+        Snackbar(
+            text='The task has been deleted!',
+            snackbar_x=dp(10),
+            snackbar_y=dp(10),
+            size_hint_x=.94,
+            size_hint_y=.08,
+            bg_color=(1, 170 / 255, 23 / 255, 1),
+            font_size='18sp',
+        ).open()
+        if value:
+            description.text = f'[s]{description.text}[/s]'
+            bar.md_bg_color = 0, 179/255, 0, 1
+            title.text = f'[s]{title.text}[/s]'
+            bar.md_bg_color = 0, 179/255, 0, 1
 
 TodoApp().run()
